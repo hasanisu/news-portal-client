@@ -14,4 +14,17 @@ api connection
 
 
 
-*/
+
+
+Redirecte Formula
+
+private route e ekta location nibo 
+const location = useLocation();
+ return<Navigate to='/login' state={{from: location}} replace></Navigate>
+
+login page e giye abar locatin take nibo 
+const location = useLocation();
+const from = location.state?.from?.pathname || '/';
+navigate(from, {replace: true});
+
+ */

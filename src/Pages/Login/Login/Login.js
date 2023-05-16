@@ -1,50 +1,73 @@
-import React from 'react';
-import { useContext } from 'react';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import { AuthContext } from '../../../context/AuthProvider/AuthProvider';
+import React, { useState } from "react";
+import { useContext } from "react";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import { AuthContext } from "../../../context/AuthProvider/AuthProvider";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+
+
 
 const Login = () => {
-    const {loginUser} = useContext(AuthContext);
-    const handleSubmit =event=>{
-        event.preventDefault();
+    const [error, setError] = useState('');
+    const { loginUser, setLoading } = useContext(AuthContext);
+    const navigate = useNavigate();
+    const location = useLocation();
 
-        const form = event.target;
-        const email = form.email.value;
-        const password = form.password.value;
+    const from = location.state?.from?.pathname || '/';
 
-        console.log(email, password);
+  const handleSubmit = (event) => {
+    event.preventDefault();
 
-        loginUser(email, password)
-        .then(result =>{
-            const user = result.user;
-            console.log(user)
-            form.reset();
-        })
-        .catch(e => console.error(e))
-    }
-    return (
+    const form = event.target;
+    const email = form.email.value;
+    const password = form.password.value;
 
-        <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3" controlId="formBasicEmail">
-                <Form.Label>Email address</Form.Label>
-                <Form.Control name="email" type="email" placeholder="Enter email" />
-                <Form.Text className="text-danger">
+    console.log(email, password);
 
-                </Form.Text>
-            </Form.Group>
+    loginUser(email, password)
+      .then((result) => {
+        const user = result.user;
+        console.log(user);
+        setError('');
+        form.reset();
+        if(user.emailVerified){
+          navigate(from, {replace: true});
+        }
+        else{
+          toast.error('Your email is not varified, please varify')
+        }
 
-            <Form.Group className="mb-3" controlId="formBasicPassword">
-                <Form.Label>Password</Form.Label>
-                <Form.Control name="password" type="password" placeholder="Password" />
-            </Form.Group>
+        
+      })
+      .catch((e) => {
+        console.error(e);
+        setError(e.message)
+    })
+    .finally(()=>{
+      setLoading(false);
+    })
+  };
+  return (
+    <Form onSubmit={handleSubmit}>
+      <Form.Group className="mb-3" controlId="formBasicEmail">
+        <Form.Label>Email address</Form.Label>
+        <Form.Control name="email" type="email" placeholder="Enter email" />
+      </Form.Group>
 
-            <Button variant="primary" type="submit">
-                Login
-            </Button>
-        </Form>
+      <Form.Group className="mb-3" controlId="formBasicPassword">
+        <Form.Label>Password</Form.Label>
+        <Form.Control name="password" type="password" placeholder="Password" />
+      </Form.Group>
 
-    );
+      <Button variant="primary" type="submit">
+        Login
+      </Button>
+      <Form.Text className="text-danger">
+        {error}
+      </Form.Text>
+    </Form>
+  );
 };
 
 export default Login;
