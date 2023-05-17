@@ -45,7 +45,7 @@ const AuthProvider = ({children}) => {
         if(currentUser === null || currentUser.emailVerified){
             setUser(currentUser);
         }
-        setLoading(true);
+        setLoading(false);
         }); 
         return()=>{
             unsubcribe();
